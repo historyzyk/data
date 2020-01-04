@@ -3,8 +3,11 @@ package com.ruoyi.web.controller.system;
 import java.util.List;
 
 import com.ruoyi.api.controller.system.User;
+import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.ExcelUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysUser;
+import com.ruoyi.village.domain.VillagerInfo;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +28,7 @@ import com.ruoyi.framework.util.ShiroUtils;
 import com.ruoyi.system.domain.SysMenu;
 import com.ruoyi.system.domain.SysRole;
 import com.ruoyi.system.service.ISysMenuService;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 
@@ -215,5 +219,50 @@ public class SysMenuController extends BaseController
         List<SysMenu> list = menuService.selectMenuList(menu,new Long(123));//@TODO userId 未知
         ExcelUtil<SysMenu> util = new ExcelUtil<SysMenu>(SysMenu.class);
         return util.exportExcel(list, "menu");
+    }
+    /**
+     * 导入数据
+     */
+    @PostMapping("/importData")
+    @ResponseBody
+    public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception
+    {
+        ExcelUtil<SysMenu> util = new ExcelUtil<SysMenu>(SysMenu.class);
+        List<SysMenu> userList = util.importExcel(file.getInputStream());
+        String message = importUser(userList, updateSupport);
+        return AjaxResult.success(message);
+    }
+
+    /**
+     * 导入用户数据
+     *
+     * @param userList 用户数据列表
+     * @param isUpdateSupport 是否更新支持，如果已存在，则进行更新数据(该功能未实现)
+     * @return 结果
+     */
+    public String importUser(List<SysMenu> userList, Boolean isUpdateSupport)
+    {
+        if (StringUtils.isNull(userList) || userList.size() == 0)
+        {
+            throw new BusinessException("导入用户数据不能为空！");
+        }
+        int successNum = 0;
+        StringBuilder successMsg = new StringBuilder();
+        StringBuilder failureMsg = new StringBuilder();
+        /*通过读取表格内容获得userlist，再通过遍历userlist去将每一行数据插入数据库中*/
+        for (SysMenu user : userList)
+        {
+            try{
+                menuService.insertMenu(user);
+                successNum++;
+                successMsg.append("<br/>" + successNum + "用户 " + user.getMenuName() + " 导入成功");
+            }
+            catch (Exception e)
+            {
+                String msg = user.getMenuName() + " 导入失败：";
+                failureMsg.append(msg + e.getMessage());
+            }
+        }
+        return successMsg.toString();
     }
 }

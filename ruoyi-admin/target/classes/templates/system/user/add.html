@@ -60,16 +60,18 @@
 	                </select>
 				</div>
 			</div>
+			<input id="status" name="status" value="1" class="form-control" type="hidden" >
 			<div class="form-group">
 				<label class="col-sm-3 control-label">状态：</label>
 				<div class="col-sm-8">
 					<div class="onoffswitch">
-                         <input type="checkbox" th:checked="true" class="onoffswitch-checkbox" id="status" name="status">
-                         <label class="onoffswitch-label" for="status">
-                             <span class="onoffswitch-inner"></span>
-                             <span class="onoffswitch-switch"></span>
-                         </label>
-                     </div>
+						<input type="checkbox"  class="onoffswitch-checkbox" id="ctype1" name="ctype1" checked onclick="changevalue();" />
+						<label class="onoffswitch-label" for="ctype1">
+							<span class="onoffswitch-inner"></span>
+							<span class="onoffswitch-switch"></span>
+						</label>
+
+					</div>
 				</div>
 			</div>
 			<div class="form-group">
@@ -279,7 +281,31 @@
                 layer.close(index);
             }
         }
-      /* /!* var c=0,limit=1;*!/
+
+
+        $(function(){
+            var ctype2=document.getElementById("ctype1");
+            var data = $("#status").val();
+            if(data=="1"){
+                ctype2.checked=true;
+            }else{
+                ctype2.checked=false;
+            }
+        });
+        var aa = $("#status").val();
+        var aflag = 0;
+        function changevalue() {
+            aflag++;
+            if (aflag % 2 == 0) {
+                $("#status").val(aa);
+            } else {
+                if (aa == "1") {
+                    $("#status").val("0");
+                } else {
+                    $("#status").val("1");
+                }
+            }
+            /* /!* var c=0,limit=1;*!/
         function doCheck(obj) {
             /!*obj.checked?c++:c--;
             if(c>limit){
@@ -290,25 +316,27 @@
             alert("aaa");
         }*/
 
-		$(function() {
-			$('#post').select2({
-				placeholder: "请选择你的岗位",
-				allowClear: true
-			});
-		})
+            $(function () {
+                $('#post').select2({
+                    placeholder: "请选择你的岗位",
+                    allowClear: true
+                });
+            })
 
-		var eye = document.getElementById("eye");
-		var pwd = document.getElementById("password");
-		function showhide(){
+            var eye = document.getElementById("eye");
+            var pwd = document.getElementById("password");
 
-			if (pwd.type == "password") {
-				pwd.type = "text";
-				eye.className='fa fa-eye-slash'
-			}else {
-				pwd.type = "password";
-				eye.className='fa fa-eye'
-			}
-		}
+            function showhide() {
+
+                if (pwd.type == "password") {
+                    pwd.type = "text";
+                    eye.className = 'fa fa-eye-slash'
+                } else {
+                    pwd.type = "password";
+                    eye.className = 'fa fa-eye'
+                }
+            }
+        }
     </script>
 </body>
 </html>
